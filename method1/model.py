@@ -17,10 +17,10 @@ def saliency_map(model, save_path, verbose, args):
     input_tensor.requires_grad_(True) 
 
     # Forward Pass
-    with torch.no_grad():
-        logits = wrapped_model(input_tensor)
-        pred_class = logits.argmax(dim=1).item()
-    
+    #with torch.no_grad():
+    logits = wrapped_model(input_tensor)
+    pred_class = logits.argmax(dim=1).item()
+
     # Backward Pass
     wrapped_model.zero_grad()
     logits[0, pred_class].backward()
