@@ -1,5 +1,5 @@
-from utils import ModelWrapper
-from utils import heatmap_plot, channel_importance_plot, band_importance_plot
+from .utils import ModelWrapper
+from .utils import heatmap_plot, channel_importance_plot, band_importance_plot
 
 import torch
 import os
@@ -17,8 +17,9 @@ def saliency_map(model, save_path, verbose, args):
     input_tensor.requires_grad_(True) 
 
     # Forward Pass
-    logits = wrapped_model(input_tensor)
-    pred_class = logits.argmax(dim=1).item()
+    with torch.no_grad():
+        logits = wrapped_model(input_tensor)
+        pred_class = logits.argmax(dim=1).item()
     
     # Backward Pass
     wrapped_model.zero_grad()
@@ -34,7 +35,7 @@ def saliency_map(model, save_path, verbose, args):
     bands_labels = ['Delta', 'Theta', 'Alpha','Beta', 'Gamma']
 
     heatmap_plot(args, heatmap_data, save_path, pred_class, bands_labels)
-    channel_importance_plot(args, heatmap_data, save_path, pred_class, bands_labels)
+    channel_importance_plot(args, heatmap_data, save_path, pred_class)
     band_importance_plot(args, heatmap_data, save_path, pred_class, bands_labels)
     
     mean_importance = heatmap_data.mean(axis=1)
