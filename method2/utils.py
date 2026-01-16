@@ -35,7 +35,7 @@ def heatmap_plot(args, heatmap_data, save_path, pred_class, bands_labels):
     plt.xlabel("Frequency Bands")
     plt.ylabel("EEG Channels")
     plt.tight_layout()
-    save_plot(save_path, f"heatmap_sub{args['subject_id']}_cl{pred_class}_{args['model_type']}.png")
+    save_plot(save_path, f"ixg_heatmap_sub{args['subject_id']}_cl{pred_class}_{args['model_type']}.png")
 
 def channel_importance_plot(args, heatmap_data, save_path, pred_class):
     mean_importance = heatmap_data.mean(axis=1)
@@ -49,7 +49,7 @@ def channel_importance_plot(args, heatmap_data, save_path, pred_class):
     plt.title(f"Channel Importance (Input x Gradient)\nSubject {args['subject_id']} | Class {pred_class}")
     plt.grid(axis='y', alpha=0.3)
     plt.tight_layout()
-    save_plot(save_path, f"channels_sub{args['subject_id']}_cl{pred_class}_{args['model_type']}.png")
+    save_plot(save_path, f"ixg_channels_sub{args['subject_id']}_cl{pred_class}_{args['model_type']}.png")
 
 def band_importance_plot(args, heatmap_data, save_path, pred_class, bands_labels):
     mean_importance = heatmap_data.mean(axis=0)
@@ -62,4 +62,4 @@ def band_importance_plot(args, heatmap_data, save_path, pred_class, bands_labels
     plt.title(f"Band Importance (Input x Gradient)\nSubject {args['subject_id']} | Class {pred_class}")
     plt.grid(axis='y', alpha=0.3)
     plt.tight_layout()
-    save_plot(save_path, f"bands_sub{args['subject_id']}_cl{pred_class}_{args['model_type']}.png")
+    save_plot(save_path, f"ixg_bands_sub{args['subject_id']}_cl{pred_class}_{args['model_type']}.png")
