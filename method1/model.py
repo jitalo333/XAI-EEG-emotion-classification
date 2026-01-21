@@ -5,7 +5,7 @@ import torch
 import os
 import numpy as np
 
-# vainilla gradient based
+# vainilla gradient based. Shows how sensitive the prediction is due to small perturbations in the input data
 def saliency_map(model, save_path, verbose, args):
     device = next(model.parameters()).device
 
