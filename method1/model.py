@@ -1,5 +1,5 @@
-from utils.utils import ModelWrapper
-from utils.utils import heatmap_plot, channel_importance_plot, band_importance_plot
+from xai_utils.data_utils import ModelWrapper
+from xai_utils.data_utils import heatmap_plot, channel_importance_plot, band_importance_plot
 
 import torch
 import numpy as np
