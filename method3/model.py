@@ -93,6 +93,9 @@ def _ig_global(model, save_path, verbose, args):
     if count == 0:
         return None
 
+    if verbose:
+        print(f"count of accumulated gradients: {count}")
+        
     # 6. Average
     avg_attributions = accumulated_attributions / count
     args['n_samples'] = count # For plot titles
