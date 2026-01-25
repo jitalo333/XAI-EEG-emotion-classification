@@ -13,7 +13,7 @@ def integrated_gradients(model, save_path, verbose, args):
     args['method_name'] = 'Integrated Gradients'
     
     if args.get('is_global', False):
-        return _ig_global(model, save_path, verbose, args)
+        return _ig_globalv2(model, save_path, verbose, args)
     else:
         return _ig_local(model, save_path, verbose, args)
 
@@ -79,6 +79,7 @@ def _ig_global(model, save_path, verbose, args):
             pred_idx = logits.argmax(dim=1).item()
             
         if pred_idx == y_test[i]:
+            print(f"Calculando IG para muestra {i}...")
             # Compute IG for this sample
             # We use the predicted class (which is also the true label)
             attrs = _compute_ig_for_sample(wrapped_model, input_tensor, pred_idx, steps, device, args.get('baseline'))
@@ -110,6 +111,73 @@ def _ig_global(model, save_path, verbose, args):
     _generate_plots_and_stats(heatmap_data, args, save_path, label_for_plot, verbose)
     
     return heatmap_data
+
+def _ig_globalv2(model, save_path, verbose, args):
+    device = next(model.parameters()).device
+    steps = args.get('steps', 50)
+
+    wrapped_model = ModelWrapper(model).to(device)
+    wrapped_model.eval()
+
+    X_test = args['X_test']
+    y_test = args['y_test']
+    target_class = args.get('target_class', None)
+
+    all_attributions = []
+    count = 0
+
+    for i in tqdm(range(len(X_test))):
+
+        # Class filtering (optional)
+        if target_class is not None and y_test[i] != target_class:
+            continue
+
+        input_tensor = torch.tensor(X_test[i], dtype=torch.float32).unsqueeze(0).to(device)
+
+        # Predict
+        with torch.no_grad():
+            logits = wrapped_model(input_tensor)
+            pred_idx = logits.argmax(dim=1).item()
+
+        # Only correct predictions
+        if pred_idx != y_test[i]:
+            continue
+
+        # Compute IG
+        attrs = _compute_ig_for_sample(
+            wrapped_model, input_tensor, pred_idx, steps, device, args.get('baseline')
+        )
+
+        # ABS attribution (optional but common)
+        attrs = np.abs(attrs)
+
+        attrs = attrs / (np.linalg.norm(attrs) + 1e-8) #per sample normalization
+
+        all_attributions.append(attrs)
+        count += 1
+
+    if count == 0:
+        return None
+
+    all_attributions = np.stack(all_attributions, axis=0)  # (N, C, B)
+
+    # Global statistics
+    mean_attr = np.mean(all_attributions, axis=0)
+
+    args['n_samples'] = count
+    label_for_plot = target_class if target_class is not None else "Global_All_Correct"
+
+    # DO NOT MINMAX GLOBAL MAP
+    heatmap_data = mean_attr
+
+    if verbose:
+        print(f"\nAveraged over {count} samples.")
+
+    _generate_plots_and_stats(heatmap_data, args, save_path, label_for_plot, verbose)
+
+
+    return heatmap_data
+
 
 def _compute_ig_for_sample(model, input_tensor, target_class, steps, device, baseline_val=None):
     """
