@@ -1,5 +1,5 @@
 from xai_utils.data_utils import ModelWrapper
-from xai_utils.data_utils import heatmap_plot, channel_importance_plot, band_importance_plot
+from xai_utils.data_utils import heatmap_plot, channel_importance_plot, band_importance_plot, get_plot_data
 
 import torch
 import numpy as np
@@ -222,10 +222,12 @@ def _normalize(data):
 def _generate_plots_and_stats(heatmap_data, args, save_path, label, verbose):
     bands_labels = ['Delta', 'Theta', 'Alpha', 'Beta', 'Gamma']
     
-    heatmap_plot(args, heatmap_data, save_path, label, bands_labels)
-    channel_importance_plot(args, heatmap_data, save_path, label)
-    band_importance_plot(args, heatmap_data, save_path, label, bands_labels)
+    plot_data = get_plot_data(heatmap_data, args)
 
+    heatmap_plot(args, plot_data, save_path, label, bands_labels)
+    channel_importance_plot(args, plot_data, save_path, label)
+    band_importance_plot(args, plot_data, save_path, label, bands_labels)
+    
     if verbose:
         mode = 'Global' if args.get('is_global') else 'Local'
         print(f"\n--- INTEGRATED GRADIENTS STATISTICS ({args['model_type']} - {mode}) ---")

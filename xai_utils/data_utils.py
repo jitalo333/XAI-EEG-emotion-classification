@@ -73,11 +73,9 @@ def get_plot_data(heatmap_data, args):
 def heatmap_plot(args, heatmap_data, save_path, pred_class, bands_labels):
     prefix, title_context, file_suffix, method_name = get_plot_params(args, pred_class)
 
-    plot_data = get_plot_data(heatmap_data, args)
-
     plt.figure(figsize=(10, 11))
     sns.heatmap(
-        plot_data,
+        heatmap_data,
         xticklabels=bands_labels,
         yticklabels=args['channels'],
         cmap='turbo',
@@ -101,8 +99,7 @@ def channel_importance_plot(args, heatmap_data, save_path, pred_class):
     prefix, title_context, file_suffix, method_name = get_plot_params(args, pred_class)
     channels_names = args['channels']
 
-    plot_data = get_plot_data(heatmap_data, args)
-    mean_importance = plot_data.mean(axis=1)
+    mean_importance = heatmap_data.mean(axis=1)
 
     plt.figure(figsize=(12, 6))
     plt.bar(range(len(channels_names)), mean_importance)
@@ -124,8 +121,7 @@ def channel_importance_plot(args, heatmap_data, save_path, pred_class):
 def band_importance_plot(args, heatmap_data, save_path, pred_class, bands_labels):
     prefix, title_context, file_suffix, method_name = get_plot_params(args, pred_class)
 
-    plot_data = get_plot_data(heatmap_data, args)
-    mean_band_importance = plot_data.mean(axis=0)
+    mean_band_importance = heatmap_data.mean(axis=0)
 
     plt.figure(figsize=(10, 5))
     plt.bar(range(len(bands_labels)), mean_band_importance, edgecolor='black', linewidth=1.5)
