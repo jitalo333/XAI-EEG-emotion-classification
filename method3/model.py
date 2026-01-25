@@ -172,7 +172,8 @@ def _ig_globalv2(model, save_path, verbose, args):
 
     if verbose:
         print(f"\nAveraged over {count} samples.")
-
+    
+    args['attr_scale'] = 'raw' 
     _generate_plots_and_stats(heatmap_data, args, save_path, label_for_plot, verbose)
 
 
