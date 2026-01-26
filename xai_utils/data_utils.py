@@ -52,21 +52,21 @@ def normalize_for_plot(data, mode="minmax", eps=1e-8):
 def get_plot_data(heatmap_data, args):
     attr_scale = args.get('attr_scale', 'normalized')
     
-    print(
-        "Before plot:",
-        heatmap_data.min(),
-        heatmap_data.max()
-    )
+    # print(
+    #     "Before plot:",
+    #     heatmap_data.min(),
+    #     heatmap_data.max()
+    # )
 
     if attr_scale == 'normalized':
         return heatmap_data
 
     plot_data = normalize_for_plot(heatmap_data, mode='minmax')
-    print(
-        "After plot norm:",
-        plot_data.min(),
-        plot_data.max()
-    )
+    # print(
+    #     "After plot norm:",
+    #     plot_data.min(),
+    #     plot_data.max()
+    # )
     return plot_data
 
 
