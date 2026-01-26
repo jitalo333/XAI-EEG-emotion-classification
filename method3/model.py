@@ -46,6 +46,7 @@ def _ig_local(model, save_path, verbose, args):
     
     return heatmap_data
 
+#normalizes the avg_attribution
 def _ig_global(model, save_path, verbose, args):
     """
     Global implementation. Averages IG attributions over correctly classified test samples.
@@ -112,6 +113,7 @@ def _ig_global(model, save_path, verbose, args):
     
     return heatmap_data
 
+#normalizes per sample
 def _ig_globalv2(model, save_path, verbose, args):
     device = next(model.parameters()).device
     steps = args.get('steps', 50)

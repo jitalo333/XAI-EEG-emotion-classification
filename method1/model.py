@@ -1,5 +1,5 @@
 from xai_utils.data_utils import ModelWrapper
-from xai_utils.data_utils import heatmap_plot, channel_importance_plot, band_importance_plot
+from xai_utils.data_utils import heatmap_plot, channel_importance_plot, band_importance_plot, get_plot_data
 
 import torch
 import numpy as np
@@ -7,10 +7,12 @@ from tqdm import tqdm
 
 #main function. It decides which method executes
 def saliency_map(model, save_path, verbose, args):
+    args['method_name'] = 'SaliencyMaps'
     if args.get('is_global', False):
         return _saliency_global(model, save_path, verbose, args)
     else:
         return _saliency_local(model, save_path, verbose, args)
+
 
 def _saliency_local(model, save_path, verbose, args):
     device = next(model.parameters()).device
@@ -91,9 +93,13 @@ def _saliency_global(model, save_path, verbose, args):
     avg_gradients = accumulated_gradients / count
     args['n_samples'] = count
     
-    heatmap_data = _normalize(avg_gradients)
-    
-    class_label = target_class if target_class is not None else "All_Correct"
+    if verbose:
+        print(f"\nAveraged over {count} samples.")
+        
+    heatmap_data = avg_gradients
+    args['attr_scale'] = 'raw' #the avg_gradient is not normalized
+
+    class_label = target_class if target_class is not None else "Global_All_Correct"
     
     if verbose:
         print(f"Averaged over {count} samples.")
@@ -101,17 +107,19 @@ def _saliency_global(model, save_path, verbose, args):
     
     return heatmap_data
 
+
 def _normalize(data):
     return (data - data.min()) / (data.max() - data.min() + 1e-8)
+
 
 def _generate_plots_and_stats(heatmap_data, args, save_path, label, verbose):
     bands_labels = ['Delta', 'Theta', 'Alpha','Beta', 'Gamma']
     
-    args['method_name'] = 'SaliencyMaps'
+    plot_data = get_plot_data(heatmap_data, args)
     
-    heatmap_plot(args, heatmap_data, save_path, label, bands_labels)
-    channel_importance_plot(args, heatmap_data, save_path, label)
-    band_importance_plot(args, heatmap_data, save_path, label, bands_labels)
+    heatmap_plot(args, plot_data, save_path, label, bands_labels)
+    channel_importance_plot(args, plot_data, save_path, label)
+    band_importance_plot(args, plot_data, save_path, label, bands_labels)
     
     if verbose:
         print(f"\n--- SALIENCY STATISTICS ({args['model_type']} - {'Global' if args.get('is_global') else 'Local'}) ---")
